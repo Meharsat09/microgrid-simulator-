@@ -8,14 +8,14 @@ This hackathon project simulates a microgrid with solar panels, battery storage,
 
 ## Features
 
-- ✅ **24-hour hourly simulation** (deterministic, no randomness)
-- ✅ **Rule-based scheduling** with clear priority logic
-- ✅ **Battery management** with realistic constraints (SoC, charge/discharge limits)
-- ✅ **Energy balance** verification at every time step
-- ✅ **Cost optimization** with Time-of-Use pricing
-- ✅ **Carbon emissions tracking** and savings calculation
-- ✅ **Explainable AI** - human-readable decision explanations for each hour
-- ✅ **FastAPI REST API** for easy integration
+-  **24-hour hourly simulation** (deterministic, no randomness)
+-  **Rule-based scheduling** with clear priority logic
+-  **Battery management** with realistic constraints (SoC, charge/discharge limits)
+-  **Energy balance** verification at every time step
+-  **Cost optimization** with Time-of-Use pricing
+-  **Carbon emissions tracking** and savings calculation
+-  **Explainable AI** - human-readable decision explanations for each hour
+-  **FastAPI REST API** for easy integration
 
 ## Architecture
 
