@@ -1,0 +1,14 @@
+{
+  "solar_capacity": 6.0,
+  "battery": {
+    "capacity": 10.0,
+    "min_soc": 0.2,
+    "max_soc": 0.95,
+    "initial_soc": 0.5,
+    "max_charge_rate": 5.0,
+    "max_discharge_rate": 5.0,
+    "efficiency": 0.95
+  },
+  "high_price_threshold": 0.20,
+  "grid_carbon_intensity": 0.42
+}
