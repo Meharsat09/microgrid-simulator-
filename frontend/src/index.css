@@ -1,12 +1,351 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
+/* ========================================
+   SCADA CONTROL ROOM THEME
+   Dark Industrial Design System
+   ======================================== */
+
+:root {
+  /* CORE COLORS - SCADA Palette */
+  --color-bg: #111827;
+  --color-surface: #1F2937;
+  --color-surface-hover: #374151;
+  --color-border: #374151;
+
+  --color-accent-primary: #F59E0B;
+  --color-accent-secondary: #FBBF24;
+  --color-accent-hover: #D97706;
+
+  --color-text: #F9FAFB;
+  --color-text-muted: rgba(249, 250, 251, 0.7);
+
+  /* SEMANTIC */
+  --color-error: #EF4444;
+  --color-success: #10B981;
+
+  /* TYPOGRAPHY */
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* CHART COLORS */
+  --chart-amber: #F59E0B;
+  --chart-yellow: #FBBF24;
+  --chart-gray: #6B7280;
+  --chart-grid: #374151;
+}
+
+* {
+  box-sizing: border-box;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: 1rem;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-secondary);
+  /* Prevent typing cursor on body */
+  caret-color: transparent;
+}
+
+/* ========================================
+   TYPOGRAPHY SYSTEM
+   ======================================== */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+  color: var(--color-text-primary);
+  margin: 0;
+  /* Prevent cursor and selection on headings */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  caret-color: transparent;
+  cursor: default;
+}
+
+h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+h2 {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+h3 {
+  font-size: clamp(1.25rem, 2.5vw, 1.875rem);
+}
+
+h4 {
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+}
+
+h5 {
+  font-size: 1.125rem;
+}
+
+h6 {
+  font-size: 1rem;
+}
+
+p {
+  margin: 0;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+}
+
+/* ========================================
+   REUSABLE COMPONENT STYLES
+   ======================================== */
+
+/* Primary Button */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-medium);
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* Card */
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* ========================================
+   SCROLLBAR STYLING
+   ======================================== */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-tertiary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-text-tertiary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+.text-primary {
+  color: var(--color-text-primary);
+}
+
+.text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.bg-primary {
+  background-color: var(--color-primary);
+}
+
+.border-primary {
+  border-color: var(--color-border-primary);
+}
+
+/* Smooth Transitions for Professional Feel */
+button,
+a,
+input,
+select,
+textarea {
+  transition: all var(--transition-base);
+}
+
+/* ========================================
+   TEXT CURSOR & SELECTION PREVENTION
+   ======================================== */
+
+/* Prevent typing cursor on all static UI elements */
+button,
+label,
+span:not(input span):not(textarea span),
+div:not([contenteditable="true"]),
+nav,
+header,
+footer,
+section,
+article {
+  caret-color: transparent;
+  cursor: default;
+}
+
+/* Prevent selection on interactive UI elements */
+button,
+label,
+nav,
+nav *:not(input):not(textarea),
+[role="button"],
+[role="tab"],
+[role="menuitem"] {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Allow selection only in actual input fields */
+input,
+textarea,
+[contenteditable="true"] {
+  user-select: text;
+  -webkit-user-select: text;
+  caret-color: auto;
+  cursor: text;
+}
+
+/* Focus Styles for Accessibility */
+*:focus-visible {
+  outline: 2px solid var(--color-primary-600);
+  outline-offset: 2px;
+}
+
+/* Custom animations for landing page hero section */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scan-horizontal {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes scan-horizontal-delayed {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-slow {
+
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes pulse-delayed {
+
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.animate-scan-horizontal {
+  animation: scan-horizontal 8s ease-in-out infinite;
+}
+
+.animate-scan-horizontal-delayed {
+  animation: scan-horizontal-delayed 10s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+.animate-pulse-delayed {
+  animation: pulse-delayed 3s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.6s ease-out forwards;
 }

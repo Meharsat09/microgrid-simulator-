@@ -10,24 +10,50 @@ const EnergyUsageChart = ({ data }) => {
   }));
 
   return (
-    <ResponsiveContainer width="100%" height={400}>
-      <BarChart data={chartData}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis 
-          dataKey="hour" 
-          label={{ value: 'Hour', position: 'insideBottom', offset: -5 }}
+    <ResponsiveContainer width="100%" height={440}>
+      <BarChart
+        data={chartData}
+        margin={{ top: 5, right: 30, left: 60, bottom: 80 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+        <XAxis
+          dataKey="hour"
+          label={{ value: 'Hour (0–23)', position: 'insideBottom', offset: -25, style: { fill: '#FBBF24', fontWeight: 700, fontSize: 14, textAnchor: 'middle' } }}
+          tick={{ fill: '#FBBF24', fontSize: 14, fontWeight: 700 }}
+          tickLine={{ stroke: '#FBBF24' }}
+          stroke="#FBBF24"
+          height={60}
         />
-        <YAxis 
-          label={{ value: 'Energy (kWh)', angle: -90, position: 'insideLeft' }}
+        <YAxis
+          label={{ value: 'Energy (kWh)', angle: -90, position: 'insideLeft', style: { fill: '#FBBF24', fontWeight: 700, fontSize: 14, textAnchor: 'middle' } }}
+          tick={{ fill: '#FBBF24', fontSize: 14, fontWeight: 700 }}
+          tickLine={{ stroke: '#FBBF24' }}
+          stroke="#FBBF24"
         />
-        <Tooltip 
+        <Tooltip
           formatter={(value) => `${value} kWh`}
           labelFormatter={(label) => `Hour ${label}`}
+          contentStyle={{
+            backgroundColor: '#1F2937',
+            border: '1px solid #374151',
+            borderRadius: '6px',
+            fontFamily: 'Inter, sans-serif',
+            color: '#F9FAFB'
+          }}
+          labelStyle={{ color: '#F9FAFB', fontWeight: 600 }}
         />
-        <Legend />
-        <Bar dataKey="solar" stackId="a" fill="#fbbf24" name="Solar" />
-        <Bar dataKey="batteryDischarge" stackId="a" fill="#f97316" name="Battery" />
-        <Bar dataKey="gridImport" stackId="a" fill="#6b7280" name="Grid" />
+        <Legend
+          wrapperStyle={{
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '14px',
+            fontWeight: 500,
+            color: '#F9FAFB',
+            paddingTop: '20px'
+          }}
+        />
+        <Bar dataKey="solar" stackId="a" fill="#FBBF24" name="Solar Generation" radius={[0, 0, 0, 0]} />
+        <Bar dataKey="batteryDischarge" stackId="a" fill="#F59E0B" name="Battery Storage" radius={[0, 0, 0, 0]} />
+        <Bar dataKey="gridImport" stackId="a" fill="#6B7280" name="Grid Import" radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );

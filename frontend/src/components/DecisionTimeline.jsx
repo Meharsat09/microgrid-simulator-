@@ -1,76 +1,91 @@
 import React from 'react';
 
 const DecisionTimeline = ({ data }) => {
-  const getDecisionColor = (decisionType) => {
-    const colors = {
-      'GRID_SUPPLY': 'bg-gray-100 border-gray-300 text-gray-800',
-      'SOLAR_ONLY': 'bg-yellow-100 border-yellow-300 text-yellow-900',
-      'SOLAR_TO_BATTERY': 'bg-green-100 border-green-300 text-green-900',
-      'BATTERY_DISCHARGE': 'bg-orange-100 border-orange-300 text-orange-900',
-      'SOLAR_AND_BATTERY': 'bg-blue-100 border-blue-300 text-blue-900',
-      'SOLAR_AND_GRID': 'bg-purple-100 border-purple-300 text-purple-900',
-      'DEFAULT': 'bg-gray-100 border-gray-300 text-gray-800'
+  const getDecisionIcon = (decisionType) => {
+    const icons = {
+      'GRID_SUPPLY': (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
+      'SOLAR_ONLY': (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+      ),
+      'SOLAR_TO_BATTERY': (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      ),
+      'BATTERY_DISCHARGE': (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+      ),
+      'SOLAR_AND_BATTERY': (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      ),
+      'SOLAR_AND_GRID': (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
     };
-    return colors[decisionType] || colors['DEFAULT'];
-  };
-
-  const getDecisionBadgeColor = (decisionType) => {
-    const colors = {
-      'GRID_SUPPLY': 'bg-gray-200 text-gray-800',
-      'SOLAR_ONLY': 'bg-yellow-200 text-yellow-900',
-      'SOLAR_TO_BATTERY': 'bg-green-200 text-green-900',
-      'BATTERY_DISCHARGE': 'bg-orange-200 text-orange-900',
-      'SOLAR_AND_BATTERY': 'bg-blue-200 text-blue-900',
-      'SOLAR_AND_GRID': 'bg-purple-200 text-purple-900',
-      'DEFAULT': 'bg-gray-200 text-gray-800'
-    };
-    return colors[decisionType] || colors['DEFAULT'];
+    return icons[decisionType] || icons['GRID_SUPPLY'];
   };
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+      <table className="min-w-full divide-y divide-scada-border">
+        <thead className="bg-scada-bg">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3.5 text-left text-xs font-semibold text-scada-textMuted uppercase tracking-wider">
               Hour
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3.5 text-left text-xs font-semibold text-scada-textMuted uppercase tracking-wider">
               Time
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Decision Type
+            <th className="px-6 py-3.5 text-left text-xs font-semibold text-scada-textMuted uppercase tracking-wider">
+              Decision
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3.5 text-left text-xs font-semibold text-scada-textMuted uppercase tracking-wider">
               Explanation
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Cost
+            <th className="px-6 py-3.5 text-right text-xs font-semibold text-scada-textMuted uppercase tracking-wider">
+              Cost (INR)
             </th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="bg-scada-surface divide-y divide-scada-border">
           {data.map((item) => (
-            <tr 
+            <tr
               key={item.hour}
-              className={`${getDecisionColor(item.decision_type)} border-l-4`}
+              className="hover:bg-scada-surfaceHover transition-colors"
             >
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-scada-text">
                 {item.hour}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-scada-textMuted">
                 {item.time}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getDecisionBadgeColor(item.decision_type)}`}>
-                  {item.decision_type.replace(/_/g, ' ')}
-                </span>
+                <div className="flex items-center gap-2">
+                  <div className="text-amber-400">
+                    {getDecisionIcon(item.decision_type)}
+                  </div>
+                  <span className="text-sm font-medium text-scada-text">
+                    {item.decision_type.replace(/_/g, ' ')}
+                  </span>
+                </div>
               </td>
-              <td className="px-6 py-4 text-sm max-w-md">
+              <td className="px-6 py-4 text-sm text-scada-textMuted max-w-md">
                 {item.explanation}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                ${item.cost_usd.toFixed(4)}
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-scada-text text-right">
+                ₹{(item.cost_usd * 83).toFixed(2)}
               </td>
             </tr>
           ))}
