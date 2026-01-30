@@ -39,52 +39,60 @@ const DecisionTimeline = ({ data }) => {
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-scada-border">
-        <thead className="bg-scada-bg">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-50">
           <tr>
-            <th className="px-6 py-3.5 text-left text-xs font-semibold text-scada-textMuted uppercase tracking-wider">
+            <th className="px-6 py-3.5 text-left text-xs font-bold text-black uppercase tracking-wider">
               Hour
             </th>
-            <th className="px-6 py-3.5 text-left text-xs font-semibold text-scada-textMuted uppercase tracking-wider">
+            <th className="px-6 py-3.5 text-left text-xs font-bold text-black uppercase tracking-wider">
               Time
             </th>
-            <th className="px-6 py-3.5 text-left text-xs font-semibold text-scada-textMuted uppercase tracking-wider">
+            <th className="px-6 py-3.5 text-left text-xs font-bold text-black uppercase tracking-wider">
               Decision
             </th>
-            <th className="px-6 py-3.5 text-left text-xs font-semibold text-scada-textMuted uppercase tracking-wider">
+            <th className="px-6 py-3.5 text-left text-xs font-bold text-black uppercase tracking-wider">
               Explanation
             </th>
-            <th className="px-6 py-3.5 text-right text-xs font-semibold text-scada-textMuted uppercase tracking-wider">
+            <th className="px-6 py-3.5 text-right text-xs font-bold text-black uppercase tracking-wider">
               Cost (INR)
             </th>
           </tr>
         </thead>
-        <tbody className="bg-scada-surface divide-y divide-scada-border">
+        <tbody className="bg-white divide-y divide-gray-200">
           {data.map((item) => (
             <tr
               key={item.hour}
-              className="hover:bg-scada-surfaceHover transition-colors"
+              className="hover:bg-gray-50 transition-colors"
             >
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-scada-text">
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-black">
                 {item.hour}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-scada-textMuted">
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-700">
                 {item.time}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center gap-2">
-                  <div className="text-amber-400">
+                  <div className="text-amber-500">
                     {getDecisionIcon(item.decision_type)}
                   </div>
-                  <span className="text-sm font-medium text-scada-text">
+                  <span className="text-sm font-bold text-black">
                     {item.decision_type.replace(/_/g, ' ')}
                   </span>
                 </div>
               </td>
-              <td className="px-6 py-4 text-sm text-scada-textMuted max-w-md">
+              <td className="px-6 py-4 text-sm text-gray-700 max-w-md">
                 {item.explanation}
+                {item.forecast_correction && (
+                  <div className="mt-2 text-xs text-amber-600 flex items-start gap-1 font-semibold">
+                    <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span className="font-medium">Forecast Correction: {item.forecast_correction}</span>
+                  </div>
+                )}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-scada-text text-right">
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-black text-right">
                 ₹{(item.cost_usd * 83).toFixed(2)}
               </td>
             </tr>

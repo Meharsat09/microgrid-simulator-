@@ -13,40 +13,40 @@ const BatterySoCChart = ({ data }) => {
         data={chartData}
         margin={{ top: 5, right: 30, left: 60, bottom: 80 }}
       >
-        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
         <XAxis
           dataKey="hour"
-          label={{ value: 'Hour (0–23)', position: 'insideBottom', offset: -25, style: { fill: '#FBBF24', fontWeight: 700, fontSize: 14, textAnchor: 'middle' } }}
-          tick={{ fill: '#FBBF24', fontSize: 14, fontWeight: 700 }}
-          tickLine={{ stroke: '#FBBF24' }}
-          stroke="#FBBF24"
+          label={{ value: 'Hour (0–23)', position: 'insideBottom', offset: -25, style: { fill: '#F59E0B', fontWeight: 700, fontSize: 14, textAnchor: 'middle' } }}
+          tick={{ fill: '#000000', fontSize: 14, fontWeight: 700 }}
+          tickLine={{ stroke: '#F59E0B' }}
+          stroke="#F59E0B"
           height={60}
         />
         <YAxis
-          label={{ value: 'State of Charge (%)', angle: -90, position: 'insideLeft', style: { fill: '#FBBF24', fontWeight: 700, fontSize: 14, textAnchor: 'middle' } }}
+          label={{ value: 'State of Charge (%)', angle: -90, position: 'insideLeft', style: { fill: '#F59E0B', fontWeight: 700, fontSize: 14, textAnchor: 'middle' } }}
           domain={[0, 100]}
-          tick={{ fill: '#FBBF24', fontSize: 14, fontWeight: 700 }}
-          tickLine={{ stroke: '#FBBF24' }}
-          stroke="#FBBF24"
+          tick={{ fill: '#000000', fontSize: 14, fontWeight: 700 }}
+          tickLine={{ stroke: '#F59E0B' }}
+          stroke="#F59E0B"
         />
         <Tooltip
           formatter={(value) => [`${value}%`, 'Battery SoC']}
           labelFormatter={(label) => `Hour ${label}`}
           contentStyle={{
-            backgroundColor: '#1F2937',
-            border: '1px solid #374151',
-            borderRadius: '6px',
+            backgroundColor: '#FFFFFF',
+            border: '2px solid #E5E7EB',
+            borderRadius: '8px',
             fontFamily: 'Inter, sans-serif',
-            color: '#F9FAFB'
+            color: '#000000'
           }}
-          labelStyle={{ color: '#F9FAFB', fontWeight: 600 }}
+          labelStyle={{ color: '#000000', fontWeight: 600 }}
         />
         <Legend
           wrapperStyle={{
             fontFamily: 'Inter, sans-serif',
             fontSize: '14px',
-            fontWeight: 500,
-            color: '#F9FAFB',
+            fontWeight: 600,
+            color: '#000000',
             paddingTop: '20px'
           }}
         />

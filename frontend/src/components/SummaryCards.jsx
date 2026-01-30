@@ -53,24 +53,26 @@ const SummaryCards = ({ baselineCost, optimizedCost, savings, savingsPercentage 
       {cards.map((card, index) => (
         <div
           key={index}
-          className={`bg-scada-surface rounded border transition-all ${card.isHighlight
+          className={`bg-white rounded-lg border-2 shadow-md transition-all hover:shadow-lg ${card.isHighlight
               ? 'border-amber-500'
-              : 'border-scada-border hover:border-amber-500/50'
+              : 'border-gray-200 hover:border-amber-300'
             } p-6`}
         >
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-semibold text-scada-textMuted uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-black uppercase tracking-wider">
               {card.title}
             </h3>
-            <div className={`${card.isHighlight ? 'text-amber-400' : 'text-scada-textMuted'}`}>
+            <div className={`${card.isHighlight ? 'text-amber-500' : 'text-gray-600'}`}>
               {card.icon}
             </div>
           </div>
-          <p className={`text-3xl lg:text-4xl font-bold mb-2 ${card.isHighlight ? 'text-amber-400' : 'text-scada-text'
-            }`}>
+          <p
+            className={`text-3xl lg:text-4xl font-bold mb-2 ${card.isHighlight ? 'text-amber-500' : 'text-black'
+              }`}
+          >
             {card.value}
           </p>
-          <p className="text-sm text-scada-textMuted font-medium">
+          <p className="text-sm text-gray-700 font-semibold">
             {card.subtitle}
           </p>
         </div>

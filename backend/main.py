@@ -63,6 +63,8 @@ class SimulationRequest(BaseModel):
     solar_capacity: float = Field(6.0, gt=0, description="Solar PV capacity in kW")
     battery: BatteryConfig = Field(default_factory=BatteryConfig, description="Battery configuration")
     grid_carbon_intensity: float = Field(0.42, gt=0, description="Grid carbon intensity (kg CO2/kWh)")
+    enable_weather_uncertainty: bool = Field(False, description="Enable weather forecast uncertainty")
+    forecast_error_range: float = Field(0.15, ge=0, le=0.5, description="Forecast error range (0-0.5 = 0-50%)")
 
 
 # Response models
@@ -81,6 +83,10 @@ class HourlyResult(BaseModel):
     emissions_kg: float
     decision_type: str
     explanation: str
+    forecast_solar_kwh: Optional[float] = None
+    actual_solar_kwh: Optional[float] = None
+    forecast_error_pct: Optional[float] = None
+    forecast_correction: Optional[str] = None
 
 
 class SimulationResponse(BaseModel):
@@ -139,6 +145,11 @@ def run_simulation(config: SimulationRequest) -> Dict:
     assert len(solars) == 24, "Solar profile must have 24 hours"
     assert len(prices) == 24, "Price profile must have 24 hours"
     
+    # Weather uncertainty setup (additive feature)
+    import random
+    weather_uncertainty_enabled = config.enable_weather_uncertainty
+    forecast_error_sigma = config.forecast_error_range if weather_uncertainty_enabled else 0.0
+    
     # Initialize scheduler with price profile for dynamic analysis
     scheduler = RuleBasedScheduler(price_profile=prices)
     daily_avg_price = scheduler.get_daily_avg_price()
@@ -149,34 +160,56 @@ def run_simulation(config: SimulationRequest) -> Dict:
     # Simulate each hour
     for hour in time_engine.iterate_hours():
         load = loads[hour]
-        solar = solars[hour]
+        forecast_solar = solars[hour]  # Original solar profile = forecast
         price = prices[hour]
         
-        # Make scheduling decision
+        # Apply weather uncertainty (if enabled)
+        if weather_uncertainty_enabled:
+            # Generate random forecast error
+            error = random.normalvariate(0, forecast_error_sigma)
+            actual_solar = forecast_solar * (1 + error)
+            actual_solar = max(0.0, actual_solar)  # Solar cannot be negative
+            forecast_error_pct = ((actual_solar - forecast_solar) / forecast_solar * 100) if forecast_solar > 0 else 0.0
+        else:
+            # No uncertainty - forecast = actual
+            actual_solar = forecast_solar
+            forecast_error_pct = 0.0
+        
+        # Make scheduling decision using FORECAST solar
         decision = scheduler.schedule_hour(
             hour=hour,
             load=load,
-            solar=solar,
+            solar=forecast_solar,  # Decisions use forecast
             battery=battery,
             price=price,
             look_ahead_hours=time_engine.get_hours_remaining()
         )
         
-        # Calculate energy balance
+        # Calculate energy balance using ACTUAL solar (reality)
         grid_energy = EnergyBalance.calculate_required_grid(
             load=load,
-            solar=solar,
+            solar=actual_solar,  # Reality uses actual
             battery_discharge=decision["battery_discharge"],
             battery_charge=decision["battery_charge"]
         )
         
         energy_balance = EnergyBalance.calculate_balance(
             load=load,
-            solar=solar,
+            solar=actual_solar,  # Reality uses actual
             battery_charge=decision["battery_charge"],
             battery_discharge=decision["battery_discharge"],
             grid=grid_energy
         )
+        
+        # Detect forecast correction (if weather uncertainty enabled)
+        forecast_correction = None
+        if weather_uncertainty_enabled and abs(forecast_error_pct) > 5.0:  # Significant error threshold
+            if forecast_error_pct < -10:  # Actual < Forecast (shortfall)
+                if energy_balance["grid_import_kwh"] > 0.1:
+                    forecast_correction = f"Unexpected grid import due to solar shortfall ({forecast_error_pct:.1f}% below forecast)"
+            elif forecast_error_pct > 10:  # Actual > Forecast (excess)
+                if energy_balance["grid_export_kwh"] > 0.1:
+                    forecast_correction = f"Extra grid export due to solar excess ({forecast_error_pct:.1f}% above forecast)"
         
         # Calculate cost
         cost_info = cost_calc.calculate_hourly_cost(
@@ -191,7 +224,7 @@ def run_simulation(config: SimulationRequest) -> Dict:
             grid_export=energy_balance["grid_export_kwh"]
         )
         
-        # Log decision
+        # Log decision (using forecast solar for decision context)
         decision_logger.log_decision(
             hour=hour,
             decision=decision,
@@ -199,14 +232,18 @@ def run_simulation(config: SimulationRequest) -> Dict:
             battery_soc=battery.get_soc_percentage(),
             price=price,
             load=load,
-            solar=solar
+            solar=forecast_solar  # Log forecast solar for decision context
         )
         
         # Store result (including decision_type from scheduler)
         hourly_results.append({
             "hour": hour,
             "load_kwh": load,
-            "solar_kwh": solar,
+            "solar_kwh": actual_solar,  # Store actual solar as primary value
+            "forecast_solar_kwh": forecast_solar if weather_uncertainty_enabled else None,
+            "actual_solar_kwh": actual_solar if weather_uncertainty_enabled else None,
+            "forecast_error_pct": forecast_error_pct if weather_uncertainty_enabled else None,
+            "forecast_correction": forecast_correction,
             "price_per_kwh": price,
             "decision": decision,
             "decision_type": decision.get("decision_type", "UNKNOWN"),  # Propagate from scheduler
@@ -333,7 +370,11 @@ def simulate(request: SimulationRequest):
                 cost_usd=round(result["cost"]["net_cost"], 4),
                 emissions_kg=round(result["carbon"]["net_emissions_kg"], 3),
                 decision_type=result["decision_type"],  # From scheduler output
-                explanation=decision["explanation"]
+                explanation=decision["explanation"],
+                forecast_solar_kwh=round(result["forecast_solar_kwh"], 3) if result.get("forecast_solar_kwh") is not None else None,
+                actual_solar_kwh=round(result["actual_solar_kwh"], 3) if result.get("actual_solar_kwh") is not None else None,
+                forecast_error_pct=round(result["forecast_error_pct"], 1) if result.get("forecast_error_pct") is not None else None,
+                forecast_correction=result.get("forecast_correction")
             ))
         
         return SimulationResponse(
