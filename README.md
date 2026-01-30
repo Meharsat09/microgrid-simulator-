@@ -1,55 +1,153 @@
 # Microgrid Simulator + Daily Energy Scheduler
 
-**Clean, explainable, time-based (24-hour) microgrid simulation backend with rule-based scheduling.**
+**Clean, explainable, time-based (24-hour) microgrid simulation backend with rule-based scheduling and optional weather uncertainty handling.**
+
+---
 
 ## Overview
 
-This hackathon project simulates a microgrid with solar panels, battery storage, and grid connection over 24 hours. It uses rule-based scheduling to minimize electricity costs and maximize renewable energy usage while providing explainable decisions for every hour.
+This hackathon project simulates a **grid-connected microgrid** with **solar PV, battery storage, and utility grid interaction** over a 24-hour horizon.
+
+The system performs **hourly energy scheduling** using deterministic, rule-based logic to minimize electricity costs, maximize renewable usage, and maintain strict physical validity.
+
+Every operational decision is logged with a **human-readable explanation**, making the simulator transparent, interpretable, and suitable for decision-support analysis.
+
+An optional **Weather Uncertainty / Forecast Error module** introduces realistic deviations between forecasted and actual solar generation, demonstrating how microgrid controllers adapt under imperfect information.
+
+---
 
 ## Features
 
--  **24-hour hourly simulation** (deterministic, no randomness)
--  **Rule-based scheduling** with clear priority logic
--  **Battery management** with realistic constraints (SoC, charge/discharge limits)
--  **Energy balance** verification at every time step
--  **Cost optimization** with Time-of-Use pricing
--  **Carbon emissions tracking** and savings calculation
--  **Explainable AI** - human-readable decision explanations for each hour
--  **FastAPI REST API** for easy integration
+- **24-hour hourly simulation** (deterministic time steps)
+- **Rule-based scheduling** with clear priority logic
+- **Battery management** with realistic constraints  
+  (SoC limits, charge/discharge limits, efficiency)
+- **Strict energy balance enforcement** at every timestep
+- **Cost optimization** using Time-of-Use (TOU) pricing
+- **Baseline vs optimized cost comparison**
+- **Carbon emissions tracking** and savings estimation
+- **Explainable AI-style decision logs** for every hour
+- **FastAPI REST API** for frontend and integration
+- **Optional weather uncertainty modeling** (forecast vs actual solar)
+
+---
 
 ## Architecture
 
+
 ```
-backend/
-├── main.py                    # FastAPI application & /simulate endpoint
-├── models/
-│   ├── battery.py            # Battery model with constraints
-│   └── microgrid.py          # Microgrid system container
-├── simulator/
-│   ├── time_engine.py        # 24-hour time step manager
-│   └── energy_balance.py     # Energy conservation calculator
-├── scheduler/
-│   ├── rule_engine.py        # Rule-based scheduling logic
-│   └── optimizer.py          # Stub for Phase-2 optimization
-├── metrics/
-│   ├── cost.py               # Cost calculation & savings
-│   └── carbon.py             # CO2 emissions tracking
-├── explainability/
-│   └── decision_log.py       # Human-readable decision explanations
-└── data/
-    ├── load_profile.py       # 24-hour load demand profile
-    ├── solar_profile.py      # 24-hour solar generation profile
-    └── price_profile.py      # 24-hour grid price profile (TOU)
+microgrid-simulator/
+├── frontend/                          # React + Vite frontend
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── LandingPage.jsx        # Project overview, features, capabilities
+│   │   │   ├── Dashboard.jsx          # Simulation results dashboard
+│   │   │   ├── Charts/
+│   │   │   │   ├── EnergyFlowChart.jsx
+│   │   │   │   ├── BatterySoCChart.jsx
+│   │   │   │   └── ForecastVsActual.jsx
+│   │   │   └── Controls/
+│   │   │       └── WeatherUncertaintyToggle.jsx
+│   │   ├── pages/
+│   │   │   ├── Home.jsx
+│   │   │   └── Product.jsx
+│   │   ├── services/
+│   │   │   └── api.js                 # REST API calls to backend
+│   │   └── App.jsx
+│   └── public/
+│       └── videos/                    # Background & UI assets
+│
+├── backend/                           # FastAPI backend
+│   ├── main.py                        # FastAPI app & /simulate endpoint
+│   ├── models/
+│   │   ├── battery.py                # Battery model with constraints
+│   │   └── microgrid.py              # Microgrid system container
+│   ├── simulator/
+│   │   ├── time_engine.py             # 24-hour time-step manager
+│   │   └── energy_balance.py          # Energy conservation validation
+│   ├── scheduler/
+│   │   ├── rule_engine.py             # Rule-based scheduling logic
+│   │   └── optimizer.py               # Stub for Phase-2 optimization
+│   ├── uncertainty/
+│   │   └── weather.py                 # Forecast vs actual solar modeling
+│   ├── metrics/
+│   │   ├── cost.py                    # Cost calculation & savings
+│   │   └── carbon.py                  # CO₂ emissions tracking
+│   ├── explainability/
+│   │   └── decision_log.py             # Hourly decision explanations
+│   └── data/
+│       ├── load_profile.py            # 24-hour load demand profile
+│       ├── solar_profile.py           # Solar forecast profile
+│       └── price_profile.py           # Time-of-Use grid pricing
+│
+└── README.md                          # Project documentation
+
 ```
+
+
+---
 
 ## Scheduling Logic (Phase-1: Rule-Based)
 
-Priority order:
-1. **Use solar to meet load** (renewable first)
-2. **Charge battery** with excess solar
-3. **Discharge battery** during high-price hours (if SoC allows)
+At every hourly timestep, the controller follows this priority order:
+
+1. **Use solar to meet local load**
+2. **Charge battery** using excess solar (if SoC allows)
+3. **Discharge battery** during high-price periods (if SoC allows)
 4. **Import from grid** as last resort
 5. **Curtail solar** if battery is full
+
+This guarantees:
+- Physical feasibility
+- Cost-aware operation
+- Fully explainable decisions
+
+---
+
+## Weather Uncertainty / Forecast Error Handling
+
+### Concept
+
+Real-world microgrids operate with **imperfect solar forecasts**.
+
+This simulator optionally models that reality by separating:
+
+- **Forecast solar generation** → used for planning decisions  
+- **Actual solar generation** → used for energy balance & cost
+
+
+---
+
+### Configurable Forecast Error Levels
+
+- ±10%  → Low uncertainty  
+- ±15%  → Medium uncertainty  
+- ±20%  → High uncertainty  
+- ±30%  → Stress-test scenario  
+
+---
+
+### Operational Behavior
+
+- Battery scheduling uses **forecast solar**
+- Energy balance and cost calculations use **actual solar**
+- Forecast deviations may trigger:
+  - Emergency battery discharge
+  - Unexpected grid import
+- All corrective actions are logged transparently
+
+---
+
+### Logged Forecast Data (Per Hour)
+
+```json
+{
+  "hour": 10,
+  "forecast_solar_kwh": 3.2,
+  "actual_solar_kwh": 2.6,
+  "forecast_error_pct": -18.7
+}
+```
 
 ## Installation
 
@@ -94,9 +192,13 @@ curl -X POST http://localhost:8000/simulate \
       "max_discharge_rate": 5.0,
       "efficiency": 0.95
     },
-    "high_price_threshold": 0.20,
-    "grid_carbon_intensity": 0.42
+    "grid_carbon_intensity": 0.42,
+    "weather_uncertainty": {
+      "enabled": true,
+      "error_range_pct": 20
+    }
   }'
+
 ```
 
 ## API Response
@@ -105,14 +207,18 @@ The `/simulate` endpoint returns:
 
 - **hourly_results**: 24 hours of detailed data
   - Energy flows (solar, battery, grid)
+  - Load demand
+  - Forecast & actual solar
+  - Battery charge/discharge
   - Battery SoC timeline
-  - Cost per hour
+  - Cost per hour (₹)
   - Emissions per hour
   - Human-readable explanation
   
 - **summary**: Aggregate metrics
-  - Total cost (optimized vs baseline)
-  - Cost savings ($, %)
+  - Total load & solar generation
+  - Total cost (optimized vs baseline) (₹)
+  - Cost savings (₹, %)
   - CO2 savings (kg, %)
   - Renewable energy usage (%)
   - Total grid import/export
@@ -133,13 +239,16 @@ The `/simulate` endpoint returns:
   "message": "Simulation completed successfully",
   "summary": {
     "total_load_kwh": 54.5,
-    "total_solar_kwh": 60.2,
-    "renewable_usage_pct": 78.5,
+    "total_solar_forecast_kwh": 60.2,
+    "total_solar_actual_kwh": 55.6,
+    "renewable_usage_pct": 74.8,
+    "weather_uncertainty_enabled": true,
+    "forecast_error_range_pct": 15,
     "cost": {
-      "optimized_cost": 6.42,
-      "baseline_cost": 8.95,
-      "absolute_savings": 2.53,
-      "percentage_savings": 28.3
+      "optimized_cost_inr": 232.40,  // ₹
+      "baseline_cost_inr": 1041.65,  // ₹
+      "absolute_savings_inr": 809.25,  // ₹
+      "percentage_savings": 77.7
     },
     "carbon": {
       "optimized_emissions_kg": 9.85,
@@ -150,16 +259,48 @@ The `/simulate` endpoint returns:
   },
   "hourly_results": [
     {
-      "hour": 0,
-      "time": "12:00 AM",
-      "load_kwh": 0.8,
-      "solar_kwh": 0.0,
-      "battery_soc_pct": 45.2,
-      "explanation": "At 12:00 AM, load is 0.80 kWh and solar is 0.00 kWh. Discharging 0.80 kWh from battery due to load deficit (SoC: 45.2%). Battery SoC: 45.2%. Energy balanced."
+      "hour": 6,
+      "time": "6:00 AM",
+      "load_kwh": 2.0,
+      "forecast_solar_kwh": 0.6,
+      "actual_solar_kwh": 0.5,
+      "forecast_error_pct": -16.7,
+      "battery_soc_pct": 58.0,
+      "grid_import_kwh": 1.5,
+      "decision": "SOLAR_PLUS_GRID",
+      "cost_inr": 12.45,
+      "explanation": "At 6:00 AM, load is 2.00 kWh. Forecasted solar was 0.60 kWh, but actual generation dropped to 0.50 kWh due to forecast error (-16.7%). Battery discharge was avoided to preserve SoC. Remaining demand was met by grid import. Energy balanced."
+    },
+    {
+      "hour": 12,
+      "time": "12:00 PM",
+      "load_kwh": 3.8,
+      "forecast_solar_kwh": 5.2,
+      "actual_solar_kwh": 4.6,
+      "forecast_error_pct": -11.5,
+      "battery_soc_pct": 95.0,
+      "grid_import_kwh": 0.0,
+      "decision": "SOLAR_ONLY",
+      "cost_inr": -6.64,
+      "explanation": "At 12:00 PM, solar generation exceeded load. Despite lower-than-forecast output, solar fully met demand and excess energy was curtailed as battery was at maximum SoC. Energy balanced."
+    },
+    {
+      "hour": 19,
+      "time": "7:00 PM",
+      "load_kwh": 4.2,
+      "forecast_solar_kwh": 0.4,
+      "actual_solar_kwh": 0.3,
+      "forecast_error_pct": -25.0,
+      "battery_soc_pct": 20.0,
+      "grid_import_kwh": 1.63,
+      "decision": "BATTERY_PLUS_GRID",
+      "cost_inr": 47.41,
+      "explanation": "At 7:00 PM, solar output was significantly lower than forecast. Battery discharged to minimum SoC limit (20%). Remaining deficit was supplied by grid import due to forecast deviation. Energy balanced."
     }
-    // ... 23 more hours
+    // ... remaining hours (0–23)
   ]
 }
+
 ```
 
 ## Key Assumptions
@@ -180,7 +321,7 @@ The `/simulate` endpoint returns:
 - **No database** - Stateless simulation
 - **No external APIs** - Self-contained
 
-## Future Enhancements (Phase-2)
+## Future Enhancements 
 
 - Optimization-based scheduling (LP, MPC, DP)
 - Multi-day simulation
@@ -196,4 +337,5 @@ This is a hackathon project for educational purposes.
 
 ## Contact
 
-Built for VLabs Hackathon 2026
+Project: Microgrid Simulator Control System
+Event: VLabs Hackathon 2026
